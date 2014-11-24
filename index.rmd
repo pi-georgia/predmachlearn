@@ -1,0 +1,126 @@
+---
+title: "Practical Machine Learning"
+author: "J. Dimitri Poteat"
+date: "Sunday, November 23, 2014"
+output: html_document
+---
+
+## Background
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement  a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: <http://groupware.les.inf.puc-rio.br/har> (see the section on the Weight Lifting Exercise Dataset)."
+
+## Data
+The data for this project come from this source: <http://groupware.les.inf.puc-rio.br/har>. The information has been generously provided for use use in this cousera course by the authors, Velloso, E.; Bulling, A.; Gellersen, H.; Ugulino, W.; Fuks, H. They have allowed the use of their paper “Qualitative Activity Recognition of Weight Lifting Exercises. Proceedings of 4th International Conference in Cooperation with SIGCHI (Augmented Human ’13) . Stuttgart, Germany: ACM SIGCHI, 2013.
+
+## Load Needed Packages
+
+
+```{r, echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+library(caret)
+library(e1071)
+library(gbm)
+library(randomForest)
+```
+
+## Reading in the Data / Cleaning Data
+
+```{r, echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+setwd("C:/Users/Dimitri/Dropbox/Coursera/predmachlearn-006/")
+training <- read.csv("./data/pml-training.csv", row.names=1,
+                     stringsAsFactors=FALSE, na.strings=c("NA", "", "#DIV/0!"))
+training <- training %>%
+  mutate(cvtd_timestamp=mdy_hm(cvtd_timestamp),
+         user_name=as.factor(user_name),
+         new_window=as.factor(new_window),
+         classe=as.factor(classe))
+
+for (i in c(8:ncol(training)-1)) {
+  training[,i] = as.numeric(as.character(training[,i]))
+}
+
+training <- training[, 6:ncol(training)]
+treshold <- dim(training)[1] * 0.95
+goodColumns <- !apply(training, 2, 
+                      function(x) sum(is.na(x)) > treshold  || sum(x=="") > treshold)
+training <- training[, goodColumns]
+badColumns <- nearZeroVar(training, saveMetrics = TRUE)
+training <- training[, badColumns$nzv==FALSE]
+
+
+test <- read.csv("./data/pml-testing.csv", row.names=1, stringsAsFactors=FALSE,
+                 na.strings = c("NA", "", "#DIV/0!"))
+test <- test %>%
+  mutate(cvtd_timestamp = mdy_hm(cvtd_timestamp),
+         user_name=as.factor(user_name),
+         new_window=as.factor(new_window))
+
+for (i in c(8:ncol(test)-1)) {
+  test[,i] = as.numeric(as.character(test[,i]))
+}
+
+test <- test[, 6:ncol(test)]
+test <- test[, goodColumns]
+test$classe <- NA
+test <- test[, badColumns$nzv==FALSE]
+```
+
+This previous code resolves the following issues found in the original data:
+  -- Multiple instances of missing data (NA, "", Dividing by 0)
+  -- Numerical values were read as boolean values
+  -- Many columns contained mainly missing values
+  -- A few other columns needed to be changed to factors
+  
+## Training and Validation Sets
+The training data needs to be separated into the training set and the validation set so that we can test our model before applying it to the test data.
+
+```{r, echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+set.seed(7899)
+trainIndex <- createDataPartition(y=training$classe, p=0.75,
+                                  list=FALSE)
+trainingSet <- training[trainIndex,]
+validationSet <- training[-trainIndex,]
+```
+
+
+## Training Data
+```{r, echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+set.seed(7899)
+
+model1 <- randomForest(classe ~ ., data=trainingSet, ntree = 100)
+# model2 <- train(classe ~ ., data=trainingSet, method="gbm")
+# model3 <- train(classe ~ ., data=trainingSet, method="lda")
+
+prediction1 <- predict(model1, validationSet)
+# prediction2 <- predict(model2, validationSet)
+# prediction3 <- predict(model3, validationSet)
+
+confusionMatrix(prediction1, validationSet$classe)
+# confusionMatrix(prediction2, validationSet$classe)
+# confusionMatrix(prediction3, validationSet$classe)
+```
+
+The model achieved an accuracy of 99.89%.
+```{r, echo=TRUE, results='asis', message=FALSE, warning=FALSE}
+accuracy <- sum(prediction1==validationSet$classe) / length(prediction1)
+```
+
+## Variable Importance
+This code determines the order of importance of the variables in the model.
+```{r, echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+importance <- varImp(model1)
+importance$Variable <- row.names(importance)
+importance[order(importance$Overall, decreasing = T), ]
+```
+
+```{r, echo=TRUE, results='asis', message=FALSE, warning=FALSE}
+importance[head(order(importance$Overall, decreasing = T),25), ]
+```
+
+## Conclusion
+Using the model on the test set we get the following results:
+```{r}
+prediction1 <- predict(model1, test)
+prediction1
+```
