@@ -22,6 +22,7 @@ library(caret)
 library(e1071)
 library(gbm)
 library(randomForest)
+library(xtable)
 ```
 
 ## Reading in the Data / Cleaning Data
@@ -115,12 +116,13 @@ importance[order(importance$Overall, decreasing = T), ]
 ```
 
 ```{r, echo=TRUE, results='asis', message=FALSE, warning=FALSE}
-importance[head(order(importance$Overall, decreasing = T),25), ]
+print(xtable(importance[head(order(importance$Overall, decreasing = T),25), ]),
+      type = "html")
 ```
 
 ## Conclusion
 Using the model on the test set we get the following results:
-```{r}
+```{r, echo=TRUE, results='asis', message=FALSE, warning=FALSE}
 prediction1 <- predict(model1, test)
-prediction1
+print(as.vector(prediction1), type = "html")
 ```

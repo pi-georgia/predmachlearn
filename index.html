@@ -60,11 +60,11 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 
 <div id="background" class="section level2">
 <h2>Background</h2>
-<p>Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement  a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: <a href="http://groupware.les.inf.puc-rio.br/har" class="uri">http://groupware.les.inf.puc-rio.br/har</a> (see the section on the Weight Lifting Exercise Dataset).&quot;</p>
+<p>Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement Â a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: <a href="http://groupware.les.inf.puc-rio.br/har" class="uri">http://groupware.les.inf.puc-rio.br/har</a> (see the section on the Weight Lifting Exercise Dataset).&quot;</p>
 </div>
 <div id="data" class="section level2">
 <h2>Data</h2>
-<p>The data for this project come from this source: <a href="http://groupware.les.inf.puc-rio.br/har" class="uri">http://groupware.les.inf.puc-rio.br/har</a>. The information has been generously provided for use use in this cousera course by the authors, Velloso, E.; Bulling, A.; Gellersen, H.; Ugulino, W.; Fuks, H. They have allowed the use of their paper “Qualitative Activity Recognition of Weight Lifting Exercises. Proceedings of 4th International Conference in Cooperation with SIGCHI (Augmented Human ’13) . Stuttgart, Germany: ACM SIGCHI, 2013.</p>
+<p>The data for this project come from this source: <a href="http://groupware.les.inf.puc-rio.br/har" class="uri">http://groupware.les.inf.puc-rio.br/har</a>. The information has been generously provided for use use in this cousera course by the authors, Velloso, E.; Bulling, A.; Gellersen, H.; Ugulino, W.; Fuks, H. They have allowed the use of their paper âQualitative Activity Recognition of Weight Lifting Exercises. Proceedings of 4th International Conference in Cooperation with SIGCHI (Augmented Human â13) . Stuttgart, Germany: ACM SIGCHI, 2013.</p>
 </div>
 <div id="load-needed-packages" class="section level2">
 <h2>Load Needed Packages</h2>
@@ -74,7 +74,8 @@ library(lubridate)
 library(caret)
 library(e1071)
 library(gbm)
-library(randomForest)</code></pre>
+library(randomForest)
+library(xtable)</code></pre>
 </div>
 <div id="reading-in-the-data-cleaning-data" class="section level2">
 <h2>Reading in the Data / Cleaning Data</h2>
@@ -150,16 +151,304 @@ confusionMatrix(prediction1, validationSet$classe)
 <pre class="r"><code>importance &lt;- varImp(model1)
 importance$Variable &lt;- row.names(importance)
 importance[order(importance$Overall, decreasing = T), ]</code></pre>
-<pre class="r"><code>importance[head(order(importance$Overall, decreasing = T),25), ]</code></pre>
-<pre><code>                 Overall             Variable</code></pre>
-<p>num_window 985.8 num_window roll_belt 914.8 roll_belt pitch_forearm 557.4 pitch_forearm yaw_belt 549.3 yaw_belt magnet_dumbbell_z 530.3 magnet_dumbbell_z pitch_belt 503.6 pitch_belt magnet_dumbbell_y 502.6 magnet_dumbbell_y roll_forearm 388.2 roll_forearm magnet_dumbbell_x 350.5 magnet_dumbbell_x accel_dumbbell_y 310.4 accel_dumbbell_y roll_dumbbell 307.5 roll_dumbbell accel_belt_z 288.5 accel_belt_z magnet_belt_z 271.9 magnet_belt_z accel_dumbbell_z 245.2 accel_dumbbell_z magnet_belt_y 233.2 magnet_belt_y roll_arm 221.8 roll_arm accel_forearm_x 220.1 accel_forearm_x gyros_belt_z 209.7 gyros_belt_z accel_dumbbell_x 202.9 accel_dumbbell_x magnet_forearm_z 195.5 magnet_forearm_z magnet_arm_x 191.0 magnet_arm_x total_accel_dumbbell 189.1 total_accel_dumbbell magnet_belt_x 176.8 magnet_belt_x yaw_dumbbell 176.1 yaw_dumbbell accel_arm_x 161.6 accel_arm_x</p>
+<pre class="r"><code>print(xtable(importance[head(order(importance$Overall, decreasing = T),25), ]),
+      type = &quot;html&quot;)</code></pre>
+<!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
+<!-- Sun Nov 23 19:28:21 2014 -->
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+Overall
+</th>
+<th>
+Variable
+</th>
+</tr>
+<tr>
+<td align="right">
+num_window
+</td>
+<td align="right">
+985.80
+</td>
+<td>
+num_window
+</td>
+</tr>
+<tr>
+<td align="right">
+roll_belt
+</td>
+<td align="right">
+914.76
+</td>
+<td>
+roll_belt
+</td>
+</tr>
+<tr>
+<td align="right">
+pitch_forearm
+</td>
+<td align="right">
+557.40
+</td>
+<td>
+pitch_forearm
+</td>
+</tr>
+<tr>
+<td align="right">
+yaw_belt
+</td>
+<td align="right">
+549.27
+</td>
+<td>
+yaw_belt
+</td>
+</tr>
+<tr>
+<td align="right">
+magnet_dumbbell_z
+</td>
+<td align="right">
+530.34
+</td>
+<td>
+magnet_dumbbell_z
+</td>
+</tr>
+<tr>
+<td align="right">
+pitch_belt
+</td>
+<td align="right">
+503.60
+</td>
+<td>
+pitch_belt
+</td>
+</tr>
+<tr>
+<td align="right">
+magnet_dumbbell_y
+</td>
+<td align="right">
+502.56
+</td>
+<td>
+magnet_dumbbell_y
+</td>
+</tr>
+<tr>
+<td align="right">
+roll_forearm
+</td>
+<td align="right">
+388.20
+</td>
+<td>
+roll_forearm
+</td>
+</tr>
+<tr>
+<td align="right">
+magnet_dumbbell_x
+</td>
+<td align="right">
+350.47
+</td>
+<td>
+magnet_dumbbell_x
+</td>
+</tr>
+<tr>
+<td align="right">
+accel_dumbbell_y
+</td>
+<td align="right">
+310.41
+</td>
+<td>
+accel_dumbbell_y
+</td>
+</tr>
+<tr>
+<td align="right">
+roll_dumbbell
+</td>
+<td align="right">
+307.47
+</td>
+<td>
+roll_dumbbell
+</td>
+</tr>
+<tr>
+<td align="right">
+accel_belt_z
+</td>
+<td align="right">
+288.49
+</td>
+<td>
+accel_belt_z
+</td>
+</tr>
+<tr>
+<td align="right">
+magnet_belt_z
+</td>
+<td align="right">
+271.89
+</td>
+<td>
+magnet_belt_z
+</td>
+</tr>
+<tr>
+<td align="right">
+accel_dumbbell_z
+</td>
+<td align="right">
+245.25
+</td>
+<td>
+accel_dumbbell_z
+</td>
+</tr>
+<tr>
+<td align="right">
+magnet_belt_y
+</td>
+<td align="right">
+233.24
+</td>
+<td>
+magnet_belt_y
+</td>
+</tr>
+<tr>
+<td align="right">
+roll_arm
+</td>
+<td align="right">
+221.80
+</td>
+<td>
+roll_arm
+</td>
+</tr>
+<tr>
+<td align="right">
+accel_forearm_x
+</td>
+<td align="right">
+220.11
+</td>
+<td>
+accel_forearm_x
+</td>
+</tr>
+<tr>
+<td align="right">
+gyros_belt_z
+</td>
+<td align="right">
+209.67
+</td>
+<td>
+gyros_belt_z
+</td>
+</tr>
+<tr>
+<td align="right">
+accel_dumbbell_x
+</td>
+<td align="right">
+202.94
+</td>
+<td>
+accel_dumbbell_x
+</td>
+</tr>
+<tr>
+<td align="right">
+magnet_forearm_z
+</td>
+<td align="right">
+195.52
+</td>
+<td>
+magnet_forearm_z
+</td>
+</tr>
+<tr>
+<td align="right">
+magnet_arm_x
+</td>
+<td align="right">
+191.04
+</td>
+<td>
+magnet_arm_x
+</td>
+</tr>
+<tr>
+<td align="right">
+total_accel_dumbbell
+</td>
+<td align="right">
+189.06
+</td>
+<td>
+total_accel_dumbbell
+</td>
+</tr>
+<tr>
+<td align="right">
+magnet_belt_x
+</td>
+<td align="right">
+176.80
+</td>
+<td>
+magnet_belt_x
+</td>
+</tr>
+<tr>
+<td align="right">
+yaw_dumbbell
+</td>
+<td align="right">
+176.06
+</td>
+<td>
+yaw_dumbbell
+</td>
+</tr>
+<tr>
+<td align="right">
+accel_arm_x
+</td>
+<td align="right">
+161.55
+</td>
+<td>
+accel_arm_x
+</td>
+</tr>
+</table>
 </div>
 <div id="conclusion" class="section level2">
 <h2>Conclusion</h2>
 <p>Using the model on the test set we get the following results:</p>
 <pre class="r"><code>prediction1 &lt;- predict(model1, test)
-prediction1</code></pre>
-<p>1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 B A B A A E D B A A B C B A E E A B B B Levels: A B C D E</p>
+print(as.vector(prediction1), type = &quot;html&quot;)</code></pre>
+<p>[1] “B” “A” “B” “A” “A” “E” “D” “B” “A” “A” “B” “C” “B” “A” “E” “E” “A” [18] “B” “B” “B”</p>
 </div>
 
 
